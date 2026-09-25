@@ -1,4 +1,6 @@
 from fastapi import FastAPI
+from sqlalchemy import text
+from app.db.session import engine
 
 
 app = FastAPI(
@@ -33,4 +35,14 @@ def info():
                     "activities",
                     "tasks"
                 ]
+        }
+
+@app.get("/api/v1/health/database")
+def database_health_check():
+    with engine.connect() as connection:
+        connection.execute(text("SELECT 1"))
+
+        return {
+            "status" : "healthy",
+            "database" : "connected"
         }
