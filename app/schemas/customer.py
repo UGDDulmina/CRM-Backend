@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
 
 class CustomerCreate(BaseModel):
@@ -26,3 +26,20 @@ class CustomerListResponse(BaseModel):
     page:int
     limit:int
     total_pages:int
+
+class CustomerReplace(BaseModel):
+    name: str = Field(min_length=2, max_length=100)
+    email: EmailStr
+    phone: str | None = Field(default=None, max_length=30)
+    city: str | None = Field(default=None, max_length=100)
+
+class CustomerUpdate(BaseModel):
+    name: str | None = Field(
+        default=None,
+        min_length=2,
+        max_length=100
+    )
+    email: EmailStr | None = None
+    phone: str | None = Field(default=None, max_length=30)
+    city: str | None = Field(default=None, max_length=100)
+    

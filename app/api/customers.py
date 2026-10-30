@@ -1,15 +1,27 @@
-from fastapi import APIRouter, Depends , status, HTTPException, Query
+from fastapi import (
+    APIRouter, 
+    Depends , 
+    status, 
+    HTTPException, 
+    Query
+)
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy import select, func, or_
 
 
 from app.db.session import get_db
 from app.models.customer import Customer
-from app.schemas.customer import CustomerCreate, CustomerResponse, CustomerListResponse
+from app.schemas.customer import (
+    CustomerCreate, 
+    CustomerResponse, 
+    CustomerListResponse,
+    CustomerReplace,
+    CustomerUpdate
+)
  
 
  
-
 router = APIRouter(
     prefix="/api/v1/customers",
     tags=["Customer"]
@@ -135,4 +147,61 @@ def get_customers(
         "total_pages": total_pages 
     }
 
- 
+@router.patch(
+    "/{customer_id}",
+    response_model=CustomerResponse
+)
+def update_customer(
+    customer_id: int,
+    customer_data: CustomerUpdate,
+    database_session: Session = Depends(get_db)
+):
+    customer = database_session.get(Customer, customer_id)
+
+    if customer is None or not customer.is_active:
+        raise HTTPException(
+            status_code=404,
+            detail="Customer not found"
+        )
+    update_data = customer_data.model_dump(
+        exclude_unset=True
+    )
+
+    for field_name, value in update_data.items():
+        setattr(customer, field_name, value)
+
+    try:
+        database_session.commit()
+        database_session.refresh(customer)
+
+    except IntegrityError:
+        database_session.rollback()
+        raise HTTPException(
+            status_code=409,
+            detail="Customer update conflicts with database constraints"
+        )
+
+    return customer
+
+@router.delete(
+    "/{customer_id}",
+    status_code=status.HTTP_204_NO_CONTENT
+)
+
+def delete_customer(
+    customer_id: int,
+    database_session: Session = Depends(get_db)
+):
+    customer = database_session.get(Customer, customer_id)
+
+    if customer is None or not customer.is_active:
+        raise HTTPException(
+            status_code=404,
+            detail="Customer not found"
+        )
+
+    customer.is_active = False
+
+    database_session.commit()
+
+    return None
