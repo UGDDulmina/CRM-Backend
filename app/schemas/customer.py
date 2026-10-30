@@ -19,3 +19,10 @@ class CustomerResponse(BaseModel):
     model_config = {
         "from_attributes" : True
     }
+
+class CustomerListResponse(BaseModel):
+    items: list[CustomerResponse]
+    total:int
+    page:int
+    limit:int
+    total_pages:int
