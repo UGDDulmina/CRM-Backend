@@ -1,12 +1,15 @@
 from fastapi import FastAPI
 from sqlalchemy import text
 from app.db.session import engine
+from app.api.customers import router as customer_router
 
 
 app = FastAPI(
     title = "CRM Backend API",
     version="1.0.0"
 )
+
+app.include_router(customer_router)
 
 @app.get("/")
 def root():
@@ -46,3 +49,5 @@ def database_health_check():
             "status" : "healthy",
             "database" : "connected"
         }
+
+
