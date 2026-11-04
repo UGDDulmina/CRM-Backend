@@ -8,7 +8,7 @@ from fastapi import (
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import select, func, or_
-
+from app.models.company import Company
 
 from app.db.session import get_db
 from app.models.customer import Customer
@@ -21,7 +21,7 @@ from app.schemas.customer import (
 )
  
 
- 
+
 router = APIRouter(
     prefix="/api/v1/customers",
     tags=["Customer"]
@@ -37,18 +37,42 @@ def create_customer(
     customer_data: CustomerCreate,
     database_session: Session = Depends(get_db)
 ):
+    if customer_data.company_id is not None:
+        company = database_session.get(
+            Company,
+            customer_data.company_id
+        )
+        if company is None:
+            raise HTTPException(
+                status_code=404,
+                detail="Company not found"
+            )
+        
     customer = Customer(
         name = customer_data.name,
         email = customer_data.email,
         phone= customer_data.phone,
-        city=customer_data.city
+        city=customer_data.city,
+        company_id=customer_data.company_id
     )
 
     database_session.add(customer)
-    database_session.commit()
-    database_session.refresh(customer)
+
+    try:
+       database_session.commit()
+       database_session.refresh(customer)
+
+    except IntegrityError:
+       database_session.rollback()
+
+       raise HTTPException(
+        status_code=409,
+        detail="Customer conflicts with database constraints"
+    )
 
     return customer
+
+     
 
 @router.get(
     "/{customer_id}",
@@ -60,12 +84,12 @@ def get_customer(
     database_session: Session = Depends(get_db)
 ):
     statement = select(Customer).where(
-        Customer.id == customer_id
+        Customer.is_active.is_(True)
     )
 
     customer = database_session.scalar(statement)
 
-    if customer is None:
+    if customer is None or not customer.is_active:
         raise HTTPException(
             status_code=404,
             detail="Customer not found"
@@ -166,6 +190,23 @@ def update_customer(
     update_data = customer_data.model_dump(
         exclude_unset=True
     )
+    if "company_id" in update_data:
+        company_id = update_data["company_id"]
+
+    if company_id is not None:
+        company = database_session.get(
+            Company,
+            company_id
+        )
+
+        if company is None:
+            raise HTTPException(
+                status_code=404,
+                detail="Company not found"
+            )
+
+    for field_name, value in update_data.items():
+        setattr(customer, field_name, value)
 
     for field_name, value in update_data.items():
         setattr(customer, field_name, value)

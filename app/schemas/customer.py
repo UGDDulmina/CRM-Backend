@@ -6,6 +6,7 @@ class CustomerCreate(BaseModel):
     email: EmailStr
     phone: str | None = None
     city: str | None = None
+    company_id: int | None = Field(default=None, gt=0)
 
 class CustomerResponse(BaseModel):
     id:int
@@ -15,6 +16,7 @@ class CustomerResponse(BaseModel):
     city: str | None
     created_at: datetime
     updated_at: datetime
+    company_id: int | None
 
     model_config = {
         "from_attributes" : True
@@ -42,4 +44,3 @@ class CustomerUpdate(BaseModel):
     email: EmailStr | None = None
     phone: str | None = Field(default=None, max_length=30)
     city: str | None = Field(default=None, max_length=100)
-    

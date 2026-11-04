@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from sqlalchemy import text
 from app.db.session import engine
 from app.api.customers import router as customer_router
-
+from app.api.companies import router as company_router
 
 app = FastAPI(
     title = "CRM Backend API",
@@ -10,6 +10,7 @@ app = FastAPI(
 )
 
 app.include_router(customer_router)
+app.include_router(company_router)
 
 @app.get("/")
 def root():
