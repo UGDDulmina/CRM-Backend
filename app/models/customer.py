@@ -7,7 +7,9 @@ from app.db.base import Base
 
 from typing import Optional, TYPE_CHECKING
 
+
 if TYPE_CHECKING:
+    from app.models.lead import Lead
     from app.models.company import Company
 
 class Customer(Base):
@@ -67,6 +69,11 @@ class Customer(Base):
         "Company",
         back_populates="customers"
     )
+
+    leads: Mapped[list["Lead"]] = relationship(
+       "Lead",
+       back_populates="customer"
+     )
 
 
     
