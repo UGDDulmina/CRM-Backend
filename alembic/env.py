@@ -15,6 +15,7 @@ from app.models.customer import Customer
 from app.models.lead import Lead
 from app.models.activity import Activity
 from app.models.task import Task
+from app.models.users import User
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

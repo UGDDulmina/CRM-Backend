@@ -6,6 +6,8 @@ from app.api.companies import router as company_router
 from app.api.lead import router as lead_router
 from app.api.activities import router as activity_router
 from app.api.tasks import router as task_router
+from app.api.auth import router as auth_router
+from app.api.users import router as users_router
 
 app = FastAPI(
     title = "CRM Backend API",
@@ -17,6 +19,8 @@ app.include_router(company_router)
 app.include_router(lead_router)
 app.include_router(activity_router)
 app.include_router(task_router)
+app.include_router(auth_router)
+app.include_router(users_router)
 
 @app.get("/")
 def root():
