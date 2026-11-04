@@ -20,6 +20,17 @@ from app.schemas.lead import (
     LeadListResponse
 )
 
+ALLOWED_TRANSITIONS = {
+    LeadStatus.NEW: {LeadStatus.CONTACTED},
+    LeadStatus.CONTACTED: {LeadStatus.QUALIFIED},
+    LeadStatus.QUALIFIED: {
+        LeadStatus.WON,
+        LeadStatus.LOST
+    },
+    LeadStatus.WON: set(),
+    LeadStatus.LOST: set()
+}
+
 
 router = APIRouter(
     prefix="/api/v1/leads",
@@ -167,3 +178,43 @@ def get_leads(
         "limit": limit,
         "total_pages": (total + limit - 1) // limit
     }
+
+@router.patch(
+    "/{lead_id}/status",
+    response_model=LeadResponse
+)
+def update_lead_status(
+    lead_id: int,
+    status_data: LeadStatusUpdate,
+    database_session: Session = Depends(get_db)
+):
+    lead = database_session.get(Lead, lead_id)
+
+    if lead is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Lead not found"
+        )
+
+    allowed_statuses = ALLOWED_TRANSITIONS[lead.status]
+
+    if status_data.status not in allowed_statuses:
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                f"Cannot change status from "
+                f"{lead.status.value} to "
+                f"{status_data.status.value}"
+            )
+        )
+
+    lead.status = status_data.status
+
+    try:
+        database_session.commit()
+        database_session.refresh(lead)
+    except Exception:
+        database_session.rollback()
+        raise
+
+    return lead

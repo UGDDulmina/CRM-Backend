@@ -7,6 +7,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
   from app.models.company import Company
   from app.models.customer import Customer
+  from app.models.activity import Activity
+  from app.models.task import Task
 
 from sqlalchemy import (
     String,
@@ -82,5 +84,14 @@ class Lead(Base):
     company: Mapped["Company | None"] = relationship(
         "Company",
         back_populates="leads"
+    )
+    activities: Mapped[list["Activity"]] = relationship(
+       "Activity",
+        back_populates="lead"
+    )
+
+    tasks: Mapped[list["Task"]] = relationship(
+        "Task",
+         back_populates="lead"
     )
 

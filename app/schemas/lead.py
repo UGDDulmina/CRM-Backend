@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field, ConfigDict
 from app.models.lead import LeadStatus
 
 
+
 class LeadCreate(BaseModel):
     title: str = Field(min_length=3, max_length=150)
     description: str | None = None
