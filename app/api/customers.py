@@ -9,6 +9,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import select, func, or_
 from app.models.company import Company
+from app.core.dependencies import require_roles
+from app.models.users import UserRole, User
 
 from app.db.session import get_db
 from app.models.customer import Customer

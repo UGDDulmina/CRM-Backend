@@ -1,4 +1,5 @@
 from datetime import datetime
+from app.models.users import UserRole
 
 from pydantic import (
     BaseModel,
@@ -33,7 +34,7 @@ class UserResponse(BaseModel):
     email: EmailStr
     is_active: bool
     created_at: datetime
-
+    role: UserRole
     model_config = ConfigDict(from_attributes=True)
 
 

@@ -9,6 +9,9 @@ from fastapi import (
 from sqlalchemy import select, func
 from sqlalchemy.orm import Session
 
+from app.core.dependencies import require_roles
+from app.models.users import UserRole, User
+
 from app.db.session import get_db
 from app.models.customer import Customer
 from app.models.company import Company
@@ -44,7 +47,13 @@ router = APIRouter(
 )
 def create_lead(
     lead_data: LeadCreate,
-    database_session: Session = Depends(get_db)
+    database_session: Session = Depends(get_db),
+    current_user: User = Depends(
+        require_roles(
+            UserRole.ADMIN,
+            UserRole.SALESPERSON
+        )
+    )
 ):
     customer = database_session.get(
         Customer,
