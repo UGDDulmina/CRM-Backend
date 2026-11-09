@@ -21,9 +21,8 @@ class Company(Base):
     )
 
     city: Mapped[str | None] = mapped_column(
-        DateTime(timezone=True),
-        default=lambda: datetime.now(timezone.utc),
-        nullable=False
+       String(100),
+       nullable=True
     )
 
     created_at: Mapped[datetime] = mapped_column(
