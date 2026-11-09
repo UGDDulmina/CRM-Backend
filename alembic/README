@@ -1,1 +1,100 @@
-Generic single-database configuration.
+# CRM Backend API
+
+A RESTful Customer Relationship Management backend developed using Python, FastAPI, PostgreSQL, SQLAlchemy and Docker.
+
+## Features
+
+- Customer management with soft deletion
+- Company management
+- Lead management and sales pipeline tracking
+- Activities and follow-up tasks
+- JWT-based user authentication
+- Role-based access control (Admin and Salesperson)
+- CRM analytics dashboard
+- Automated API testing using pytest
+- PostgreSQL database migrations using Alembic
+- Docker Compose setup
+
+## Technology Stack
+
+| Technology | Purpose |
+|---|---|
+| Python | Backend programming language |
+| FastAPI | REST API framework |
+| PostgreSQL | Relational database |
+| SQLAlchemy | ORM and database queries |
+| Alembic | Database migrations |
+| Pydantic | Request and response validation |
+| JWT | Authentication |
+| pytest | Automated testing |
+| Docker | Containerization |
+
+## Getting Started
+
+### Prerequisites
+
+- Docker Desktop
+- Docker Compose
+- Git
+
+### Installation
+
+1. Clone the repository.
+2. Copy `.env.example` to `.env`.
+3. Configure the required environment variables.
+4. Build and start PostgreSQL.
+5. Apply the verified Alembic migrations.
+6. Start the API container.
+
+```bash
+docker compose build
+docker compose up -d db
+docker compose run --rm api alembic upgrade head
+docker compose up -d api
+```
+
+### API Documentation
+
+After starting the application:
+
+`http://localhost:8000/docs`
+
+### Testing
+
+Create and configure a dedicated PostgreSQL test database, then run:
+
+```bash
+python -m pytest
+```
+
+### API Modules
+
+- Authentication
+- Users
+- Customers
+- Companies
+- Leads
+- Activities
+- Tasks
+- Dashboard
+
+## Security
+
+- Password hashing using Argon2
+- JWT authentication
+- Role-based permissions
+- Protected API routes
+- Environment-based configuration
+
+## Future Improvements
+
+- Pagination improvements
+- Advanced reporting and filters
+- Refresh-token authentication
+- CI/CD pipeline
+- Cloud deployment
+- Frontend integration
+
+## Project Purpose
+
+This project was developed to practice modern Python backend development, relational database design, API security, automated testing and deployment workflows.
